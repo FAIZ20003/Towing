@@ -1,0 +1,374 @@
+﻿@model Proffessional.Models.TowingCase
+@{
+    ViewData["Title"] = "Edit Towing Case";
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>@ViewData["Title"]</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        html, body {
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: #f3f4f6;
+            color: #111827;
+        }
+
+        .app {
+            display: flex;
+            height: 100vh;
+        }
+
+        /* SIDEBAR */
+        .sidebar {
+            width: 240px;
+            background: #1f2937;
+            color: #e5e7eb;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .logo {
+            height: 60px;
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            font-weight: 700;
+            font-size: 18px;
+            background: #111827;
+        }
+
+        .sidebar nav a {
+            display: block;
+            padding: 12px 20px;
+            color: #d1d5db;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+            .sidebar nav a:hover,
+            .sidebar nav a.active {
+                background: #2563eb;
+                color: #fff;
+            }
+
+        /* MAIN */
+        .main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            height: 60px;
+            background: #fff;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding: 0 20px;
+        }
+
+        .content {
+            padding: 24px;
+            overflow-y: auto;
+        }
+
+        .page-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+
+        /* FORM BOX */
+        .box {
+            background: #fff;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+        }
+
+        .box-header {
+            padding: 12px 16px;
+            border-bottom: 1px solid #e5e7eb;
+            font-weight: 600;
+            background: #f9fafb;
+        }
+
+        .box-body {
+            padding: 16px;
+        }
+
+        label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #374151;
+            margin-top: 10px;
+            display: block;
+        }
+
+        input, textarea, select {
+            width: 100%;
+            padding: 8px 10px;
+            border-radius: 6px;
+            border: 1px solid #d1d5db;
+            margin-top: 4px;
+        }
+
+            input[readonly] {
+                background: #f3f4f6;
+                cursor: not-allowed;
+            }
+
+        textarea {
+            resize: vertical;
+        }
+
+        .actions {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-primary {
+            background: #2563eb;
+            border: none;
+            color: #fff;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .btn-secondary {
+            background: #e5e7eb;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            text-decoration: none;
+            color: #111827;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="app">
+
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+            <div class="logo">🚚 Towing</div>
+            <nav>
+                <a href="/Case/Create">Create Case</a>
+                <a class="active" href="/Case/List">Case List</a>
+                <a href="/Dashboard/Index">Dashboard</a>
+                <a href="/Staff/List">Staff</a>
+            </nav>
+        </aside>
+
+        <!-- MAIN -->
+        <div class="main">
+
+            <!-- HEADER -->
+            <div class="header">
+                <div>Admin</div>
+            </div>
+
+            <!-- CONTENT -->
+            <div class="content">
+                <div class="page-title">✏️ Edit Towing Case</div>
+
+                <div class="box">
+                    <div class="box-header">Case Details</div>
+                    <div class="box-body">
+
+                        <form id="editForm">
+
+                            <!-- CASE ID -->
+                            <label>Case ID</label>
+                            <input name="CaseId" value="@Model.CaseId" readonly />
+                            <input type="hidden" id="CaseId" name="CaseId" value="@Model.CaseId" />
+
+                            <label>Customer Name</label>
+                            <input name="CustomerName" value="@Model.CustomerName" />
+
+                            <label>Vehicle Brand</label>
+                            <input name="VehicleBrand" value="@Model.VehicleBrand" />
+
+                            <label>Model</label>
+                            <input name="Model" value="@Model.Model" />
+
+                            <label>Registration No</label>
+                            <input name="RegistrationNo" value="@Model.RegistrationNo" />
+
+                            <label>Chassis No</label>
+                            <input name="ChassisNo" value="@Model.ChassisNo" />
+
+                            <label>Customer Contact Number</label>
+                            <input name="CustomerContactNumber" value="@Model.CustomerContactNumber" />
+
+                            <label>Incident Reason</label>
+                            <input name="IncidentReason" value="@Model.IncidentReason" />
+
+                            <label>Incident Place</label>
+                            <textarea name="IncidentPlace" rows="3">@Model.IncidentPlace</textarea>
+
+                            <label>Drop Location</label>
+                            <textarea name="DropLocation" rows="3">@Model.DropLocation</textarea>
+
+                            <label>Assigned Vendor Name</label>
+                            <input name="AssignedVendorName" value="@Model.AssignedVendorName" />
+
+                            <label>Vendor Contact Number</label>
+                            <input name="VendorContactNumber" value="@Model.VendorContactNumber" />
+
+                            <label>Towing Type</label>
+                            <select name="TowingType">
+                                <option value="">-- Select --</option>
+                                <option value="Breakdown" selected="@(Model.TowingType=="Breakdown")">Breakdown</option>
+                                <option value="Accident" selected="@(Model.TowingType=="Accident")">Accident</option>
+                                <option value="Flat Tyre" selected="@(Model.TowingType=="Flat Tyre")">Flat Tyre</option>
+                                <option value="Battery Issue" selected="@(Model.TowingType=="Battery Issue")">Battery Issue</option>
+                            </select>
+
+                            <label>Assign Staff *</label>
+                            <select name="AssignedStaffId" required>
+                                <option value="">-- Select Staff --</option>
+                                @foreach (var s in ViewBag.StaffList)
+                                {
+                                    <option value="@s.StaffId"
+                                            selected="@(Model.AssignedStaffId == s.StaffId)">
+                                        @s.StaffName
+                                    </option>
+                                }
+                            </select>
+                            <label>Status <span style="color:red">*</span></label>
+                            <select name="Status" id="Status" required>
+                                <option value="New" @(Model.Status == "New" ? "selected" : "")>New</option>
+                                <option value="In Progress" @(Model.Status == "In Progress" ? "selected" : "")>In Progress</option>
+                                <option value="Closed" @(Model.Status == "Closed" ? "selected" : "")>Closed</option>
+                            </select>
+                            <div class="actions">
+                                <button type="button" class="btn-primary" onclick="updateCase()">
+                                    💾 Update Case
+                                </button>
+                                <button type="button"
+                                        style="background:#dc2626;color:#fff;border:none;padding:8px 14px;border-radius:6px;"
+                                        onclick="confirmDelete()">
+                                    🗑 Delete Case
+                                </button>
+                                <a href="/Case/List" class="btn-secondary">⬅ Back</a>
+                            </div>
+
+                        </form>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <!-- 🔔 POPUP MODAL -->
+    <div id="popup" style="
+    display:none;
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,0.5);
+    align-items:center;
+    justify-content:center;
+    z-index:9999;
+">
+        <div style="
+        background:#fff;
+        padding:25px;
+        border-radius:10px;
+        width:420px;
+        text-align:center;
+    ">
+            <h3 id="popupTitle"></h3>
+            <p id="popupMessage" style="margin:15px 0;"></p>
+
+            <button class="btn-primary" onclick="closePopup()">OK</button>
+        </div>
+    </div>
+    <script>
+        async function updateCase() {
+            const form = document.getElementById("editForm");
+            const formData = new FormData(form);
+
+            const res = await fetch('/Case/Edit', {
+                method: 'POST',
+                body: formData
+            });
+
+            const result = await res.text();
+
+            if (result.includes("✅")) {
+                showPopup("Success 🎉", result, true);
+            } else {
+                showPopup("Error ❌", result, false);
+            }
+        }
+
+        function showPopup(title, message, redirect) {
+            popupTitle.innerText = title;
+            popupMessage.innerText = message;
+            popup.style.display = "flex";
+
+            popup.dataset.redirect = redirect ? "yes" : "no";
+        }
+
+        function closePopup() {
+            popup.style.display = "none";
+
+            if (popup.dataset.redirect === "yes") {
+                window.location.href = "/Case/List";
+            }
+        }
+    </script>
+    <script>
+        function confirmDelete() {
+            if (!confirm("⚠️ Are you sure you want to DELETE this case?\nThis action cannot be undone.")) {
+                return;
+            }
+
+            deleteCase();
+        }
+
+        async function deleteCase() {
+            const caseId = document.getElementById("CaseId").value;
+
+            if (!caseId) {
+                alert("❌ Case ID missing");
+                return;
+            }
+
+            const res = await fetch('/Case/Delete', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: `caseId=${encodeURIComponent(caseId)}`
+            });
+
+            const result = await res.text();
+
+            if (result.includes("✅")) {
+                alert("✅ Case deleted successfully");
+                window.location.href = "/Case/List";
+            } else {
+                alert(result);
+            }
+        }
+    </script>
+
+
+</body>
+</html>

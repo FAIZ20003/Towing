@@ -1,0 +1,20 @@
+{
+  "Version": 1,
+  "Hash": "eUC4p5IizPYJzWcj0LKw5nJyOLK6lnkKdJuO74gA0Tw=",
+  "Source": "Proffessional",
+  "BasePath": "_content/Proffessional",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [
+    {
+      "Name": "Proffessional\\wwwroot",
+      "Source": "Proffessional",
+      "ContentRoot": "C:\\Users\\faisa\\EAM_DWN\\Proffessional\\Proffessional\\wwwroot\\",
+      "BasePath": "_content/Proffessional",
+      "Pattern": "**"
+    }
+  ],
+  "Assets": [],
+  "Endpoints": []
+}

@@ -1,0 +1,283 @@
+﻿@{
+    ViewData["Title"] = "Add Staff";
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>@ViewData["Title"]</title>
+
+    <style>
+        /* ===== RESET ===== */
+        * {
+            box-sizing: border-box;
+        }
+
+        html, body {
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: #f3f4f6;
+            color: #111827;
+        }
+
+        /* ===== LAYOUT ===== */
+        .app {
+            display: flex;
+            height: 100vh;
+        }
+
+        /* ===== SIDEBAR ===== */
+        .sidebar {
+            width: 240px;
+            background: #1f2937;
+            color: #e5e7eb;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .logo {
+            height: 60px;
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            font-size: 18px;
+            font-weight: 700;
+            background: #111827;
+        }
+
+        .sidebar nav a {
+            display: block;
+            padding: 12px 20px;
+            color: #d1d5db;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+            .sidebar nav a:hover,
+            .sidebar nav a.active {
+                background: #2563eb;
+                color: #fff;
+            }
+
+        /* ===== MAIN ===== */
+        .main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            height: 60px;
+            background: #ffffff;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+        }
+
+        .header-left {
+            font-size: 16px;
+            font-weight: 600;
+            color: #111827;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .content {
+            padding: 24px;
+            overflow-y: auto;
+        }
+
+        /* ===== FORM CARD ===== */
+        .card {
+            max-width: 520px;
+            background: #fff;
+            padding: 24px;
+            border-radius: 10px;
+            box-shadow: 0 10px 25px rgba(0,0,0,.06);
+        }
+
+            .card h3 {
+                margin-top: 0;
+                margin-bottom: 16px;
+                font-size: 18px;
+            }
+
+        label {
+            font-size: 13px;
+            font-weight: 600;
+            margin-top: 12px;
+            display: block;
+            color: #374151;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px 12px;
+            margin-top: 6px;
+            border-radius: 6px;
+            border: 1px solid #d1d5db;
+            font-size: 14px;
+        }
+
+            input:focus {
+                outline: none;
+                border-color: #2563eb;
+            }
+
+        .hint {
+            font-size: 12px;
+            color: #6b7280;
+            margin-top: 4px;
+        }
+
+        .actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .btn-primary {
+            background: #2563eb;
+            color: #fff;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .btn-secondary {
+            background: #e5e7eb;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .alert {
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .alert-success {
+            background: #dcfce7;
+            color: #166534;
+            border: 1px solid #86efac;
+        }
+
+        .alert-error {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fecaca;
+        }
+
+    </style>
+</head>
+
+<body>
+
+    <div class="app">
+
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+            <div class="logo">🚚 Towing</div>
+            <nav>
+                <a href="/Dashboard/Index">Dashboard</a>
+                <a href="/Case/List">Case List</a>
+                <a class="active">Add Staff</a>
+                <a href="/Staff/List">Staff List</a>
+            </nav>
+        </aside>
+
+        <!-- MAIN -->
+     
+            <div class="main">
+                <div class="header">
+
+                    <div class="header-left">
+                        @* <div class="page-title">Create Towing Case</div> *@
+                        <div class="page-title">➕ Add Staff</div>
+                    </div>
+
+                    <div class="header-right">
+                        <a href="/Staff/List" class="nav-link">
+                        📜 Staff List
+                        </a>
+                    </div>
+
+                </div>
+            
+            <!-- CONTENT -->
+            <div class="content">
+
+                <div class="card">
+                    <h3>Staff Details</h3>
+                    @if (TempData["Success"] != null)
+                    {
+                        <div class="alert alert-success">
+                            ✅ @TempData["Success"]
+                        </div>
+                    }
+
+                    @if (TempData["Error"] != null)
+                    {
+                        <div class="alert alert-error">
+                            ❌ @TempData["Error"]
+                        </div>
+                    }
+
+                    <form method="post">
+
+                        <label>Staff Name</label>
+                        <input name="StaffName" placeholder="Enter staff full name" required />
+
+                        <label>Phone Number</label>
+                        <input name="PhoneNumber"
+                               placeholder="10-digit mobile number"
+                               pattern="[0-9]{10}"
+                               required />
+                        <div class="hint">Used for internal contact only</div>
+
+                        <label>Username</label>
+                        <input name="Username" placeholder="Login username" required />
+
+                        <label>Password</label>
+                        <input type="password" name="Password" placeholder="Initial password" required />
+                        <div class="hint">Staff can change later</div>
+
+                        <div class="actions">
+                            <button type="submit" class="btn-primary">
+                                Create Staff
+                            </button>
+
+                            <a href="/Staff/List" class="btn-secondary">
+                                Cancel
+                            </a>
+                        </div>
+                       
+                    </form>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        setTimeout(() => {
+            document.querySelectorAll('.alert').forEach(a => a.remove());
+        }, 4000);
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,253 @@
+﻿@model IEnumerable<dynamic>
+
+@{
+    ViewData["Title"] = "Dashboard";
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Dashboard</title>
+
+    <style>
+        :root {
+            --primary: #2563eb;
+            --glass: rgba(255, 255, 255, 0.75);
+            --blur: blur(14px);
+        }
+
+        body {
+            margin: 0;
+            font-family: "Segoe UI", sans-serif;
+            background: linear-gradient(135deg, #eef2ff, #f8fafc);
+        }
+
+        .app {
+            display: flex;
+            height: 100vh;
+        }
+
+        /* ===== SIDEBAR (UNCHANGED) ===== */
+        .sidebar {
+            width: 240px;
+            background: #1f2937;
+            color: #e5e7eb;
+        }
+
+        .logo {
+            height: 60px;
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            font-size: 18px;
+            font-weight: 700;
+            background: #111827;
+        }
+
+        .sidebar a {
+            display: block;
+            padding: 12px 20px;
+            color: #d1d5db;
+            text-decoration: none;
+        }
+
+            .sidebar a.active,
+            .sidebar a:hover {
+                background: #2563eb;
+                color: #fff;
+            }
+
+        /* ===== MAIN ===== */
+        .main {
+            flex: 1;
+            padding: 32px;
+            overflow-y: auto;
+        }
+
+        .title {
+            font-size: 28px;
+            font-weight: 800;
+            margin-bottom: 30px;
+            color: #0f172a;
+        }
+
+        /* ===== KPI CARDS ===== */
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 24px;
+            margin-bottom: 45px;
+        }
+
+        .card {
+            background: linear-gradient( 135deg, rgba(255,255,255,0.9), rgba(255,255,255,0.6) );
+            backdrop-filter: var(--blur);
+            border-radius: 18px;
+            padding: 24px;
+            box-shadow: 0 20px 45px rgba(0,0,0,0.08);
+            transition: all 0.35s ease;
+        }
+
+            .card:hover {
+                transform: translateY(-6px) scale(1.03);
+                box-shadow: 0 35px 70px rgba(37,99,235,0.25);
+            }
+
+            .card h3 {
+                font-size: 14px;
+                font-weight: 600;
+                color: #64748b;
+            }
+
+            .card p {
+                margin-top: 14px;
+                font-size: 34px;
+                font-weight: 900;
+                color: var(--primary);
+            }
+
+        /* ===== SECTION TITLE ===== */
+        .section-title {
+            font-size: 20px;
+            font-weight: 800;
+            margin-bottom: 16px;
+            color: #0f172a;
+        }
+
+        /* ===== TABLE ===== */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--glass);
+            backdrop-filter: var(--blur);
+            border-radius: 18px;
+            overflow: hidden;
+            box-shadow: 0 30px 55px rgba(0,0,0,0.08);
+        }
+
+        th, td {
+            padding: 16px 18px;
+            border-bottom: 1px solid rgba(0,0,0,0.06);
+            font-size: 14px;
+        }
+
+        th {
+            background: linear-gradient(135deg, #e0e7ff, #f8fafc);
+            font-weight: 700;
+        }
+
+        tbody tr:hover {
+            background: rgba(37,99,235,0.08);
+        }
+
+        /* ===== RESPONSIVE (THIS IS THE FIX) ===== */
+        @@media (max-width: 1100px) {
+            .cards
+
+        {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .title {
+            font-size: 24px;
+        }
+
+        }
+
+        @@media (max-width: 600px) {
+            .cards
+
+        {
+            grid-template-columns: 1fr;
+        }
+
+        .main {
+            padding: 18px;
+        }
+
+        table {
+            display: block;
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+
+        .title {
+            font-size: 22px;
+        }
+
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="app">
+
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+            <div class="logo">🚚 Towing</div>
+            <a href="/Dashboard/Index" class="active">Dashboard</a>
+            <a href="/Case/Create">Create Case</a>
+            <a href="/Case/List">Case List</a>
+            <a href="/Staff/Create">Staff</a>
+        </aside>
+
+        <!-- MAIN -->
+        <div class="main">
+
+            <div class="title">📊 Analytics Dashboard</div>
+
+            <!-- KPI CARDS -->
+            <div class="cards">
+                <div class="card">
+                    <h3>Total Cases</h3>
+                    <p>@ViewBag.TotalCases</p>
+                </div>
+
+                <div class="card">
+                    <h3>Open Cases</h3>
+                    <p>@ViewBag.OpenCases</p>
+                </div>
+
+                <div class="card">
+                    <h3>Closed Cases</h3>
+                    <p>@ViewBag.ClosedCases</p>
+                </div>
+
+                <div class="card">
+                    <h3>Today's Cases</h3>
+                    <p>@ViewBag.TodayCases</p>
+                </div>
+            </div>
+
+            <!-- STAFF WORKLOAD -->
+            <div class="section-title">👤 Staff Workload Overview</div>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Staff Name</th>
+                        <th>Total Cases</th>
+                        <th>Open</th>
+                        <th>Closed</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var s in Model)
+                    {
+                        <tr>
+                            <td>@s.StaffName</td>
+                            <td>@s.Total</td>
+                            <td>@s.Open</td>
+                            <td>@s.Closed</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+
+        </div>
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,744 @@
+﻿@model IEnumerable<dynamic>
+@using System.Text.Json
+
+@{
+    ViewData["Title"] = "Case List";
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>@ViewData["Title"]</title>
+
+    <style>
+        /* ================= RESET ================= */
+        * {
+            box-sizing: border-box;
+        }
+
+        html, body {
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: #f3f4f6;
+            color: #111827;
+        }
+
+        /* ================= LAYOUT ================= */
+        .app {
+            display: flex;
+            height: 100vh;
+        }
+
+        /* ================= SIDEBAR ================= */
+        .sidebar {
+            width: 240px;
+            min-width: 240px;
+            background: #1f2937;
+            color: #e5e7eb;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .logo {
+            height: 60px;
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            font-weight: 700;
+            font-size: 18px;
+            background: #111827;
+        }
+
+        .sidebar nav a {
+            display: block;
+            padding: 12px 20px;
+            color: #d1d5db;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+            .sidebar nav a:hover,
+            .sidebar nav a.active {
+                background: #2563eb;
+                color: #fff;
+            }
+
+        /* ================= MAIN ================= */
+        .main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            height: 60px;
+            background: #ffffff;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+        }
+
+        .header-left {
+            font-size: 16px;
+            font-weight: 600;
+            color: #111827;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .nav-link {
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            color: #2563eb;
+            padding: 8px 14px;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+        }
+
+            .nav-link:hover {
+                background: #eff6ff;
+                color: #1d4ed8;
+            }
+
+
+        .content {
+            padding: 24px;
+            overflow-y: auto;
+        }
+
+        .page-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+
+        /* ================= FILTERS ================= */
+        .filters {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 16px;
+            align-items: center;
+        }
+
+            .filters input,
+            .filters select {
+                padding: 8px 12px;
+                border-radius: 6px;
+                border: 1px solid #d1d5db;
+            }
+
+        /* ================= TABLE ================= */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #fff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 10px 25px rgba(0,0,0,.05);
+        }
+
+        th, td {
+            padding: 12px 14px;
+            border-bottom: 1px solid #e5e7eb;
+            font-size: 14px;
+            text-align: left;
+         
+        }
+
+        th {
+            background: #f9fafb;
+            font-weight: 600;
+            color: #374151;
+        }
+
+        tr:hover {
+            background: #f3f4f6;
+        }
+
+        /* ================= BADGES ================= */
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+   
+
+        .badge-new {
+            background: #dbeafe;
+            color: #1d4ed8;
+        }
+
+        .badge-progress {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .badge-closed {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        /* ================= LINKS & TEXT ================= */
+        .action a {
+            color: #2563eb;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        .short-text {
+            color: #2563eb;
+            cursor: pointer;
+            text-decoration: underline;
+            font-size: 13px;
+        }
+
+        /* ================= MODAL ================= */
+        #textModal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+
+            #textModal .modal-box {
+                background: #fff;
+                padding: 20px;
+                border-radius: 8px;
+                width: 500px;
+                max-height: 70vh;
+                overflow: auto;
+            }
+
+        .btn-primary {
+            background: #2563eb;
+            border: none;
+            color: #fff;
+            padding: 6px 14px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        #caseTable th:nth-child(12),
+        #caseTable td:nth-child(12) {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="app">
+
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+            <div class="logo">🚚 Towing</div>
+            <nav>
+                <a href="/Dashboard/Index">Dashboard</a>
+                <a href="/Case/Create">Create Case</a>
+                <a class="active">Case List</a>
+                <a href="/Staff/List">Staff</a>
+            </nav>
+        </aside>
+
+        <!-- MAIN -->
+        <div class="main">
+            <div class="header">
+
+                <div class="header-left">
+                    @* <div class="page-title">Create Towing Case</div> *@
+                    <div class="page-title">Towing Case List</div>
+                </div>
+
+                <div class="header-right">
+                    <a href="/Case/FullcaseHistory" class="nav-link">
+                        📜 Full Case History
+                    </a>
+                </div>
+
+            </div>
+
+        
+            <div class="content">
+
+                <!-- FILTERS -->
+                <div class="filters">
+                    <input type="text"
+                           id="searchBox"
+                           placeholder="Search case, customer, vehicle, reg no..."
+                           onkeyup="filterTable()" />
+
+                    <select id="staffSelect" name="staffId" onchange="filterTable()">
+                        <option value="">All Staff</option>
+
+                        @foreach (var s in ViewBag.StaffList)
+                        {
+                            <option value="@s.StaffId" data-name="@s.StaffName">
+                                @s.StaffName
+                            </option>
+                        }
+                    </select>
+                </div>
+                <div style="display:flex; gap:12px; margin-bottom:16px; align-items:center;">
+                    <div class="date-filter">
+                        <span>📅</span>
+                        <input type="date" id="fromDate" onchange="filterTable()"/>
+                        <span>to</span>
+                        <input type="date" id="toDate" onchange="filterTable()"/>
+                    </div>
+
+                    <button class="btn-primary" onclick="exportExcel()">
+                        📥 Export Excel
+                    </button>
+
+                </div>
+
+                <!-- TABLE -->
+                <table id="caseTable">
+                    <thead>
+                        <tr>
+                            <th>Case ID</th>
+                            <th>Customer</th>
+                            <th>Contact</th>
+                            <th>Vehicle</th>
+                            <th>Reg No</th>
+                            <th>Incident Reason</th>
+                            <th>Incident Place</th>
+                            <th>Drop Location</th>
+                            <th>Towing</th>
+                            <th>Assigned Staff</th>
+                            <th>Status</th>
+                            <th>Created</th>
+                            <th>Action</th>
+                            <th>History</th>
+                            <th>Upload Towing Images</th>
+
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var c in Model)
+                        {
+                            <tr data-created="@c.CreatedDate.ToString("yyyy-MM-dd")">
+                                <td>@c.CaseId</td>
+                                <td>@c.CustomerName</td>
+                                <td>@c.CustomerContactNumber</td>
+                                <td>@c.VehicleBrand</td>
+                                <td>@c.RegistrationNo</td>
+                                <td>@c.IncidentReason</td>
+
+                                <td>
+                                    <span class="short-text"
+                                          onclick='showFullText(@Html.Raw(JsonSerializer.Serialize((string)c.IncidentPlace)))'>
+                                        @(string.IsNullOrEmpty(c.IncidentPlace) ? "-" :
+                                            c.IncidentPlace.Length > 30 ? c.IncidentPlace.Substring(0, 30) + "..." : c.IncidentPlace)
+                                    </span>
+                                </td>
+
+                                <td>
+                                    <span class="short-text"
+                                          onclick='showFullText(@Html.Raw(JsonSerializer.Serialize((string)c.DropLocation)))'>
+                                        @(string.IsNullOrEmpty(c.DropLocation) ? "-" :
+                                            c.DropLocation.Length > 30 ? c.DropLocation.Substring(0, 30) + "..." : c.DropLocation)
+                                    </span>
+                                </td>
+
+                                <td>@c.TowingType</td>
+                                <td>@c.AssignedStaffName</td>
+                                <td>
+                                    <!-- STATUS BADGE -->
+                                    <span class="badge @(c.Status=="New"?"badge-new":c.Status=="In Progress"?"badge-progress":"badge-closed")"
+                                          style="cursor:pointer"
+                                          onclick="showStatusSelect('@c.CaseId')"
+                                          id="badge-@c.CaseId">
+                                        @c.Status
+                                    </span>
+
+                                    <!-- STATUS SELECT (HIDDEN) -->
+                                    <select id="select-@c.CaseId"
+                                            style="display:none; padding:4px 8px; border-radius:6px;"
+                                            onchange="updateStatus('@c.CaseId', this.value)">
+                                        <option value="New" @(c.Status == "New" ? "selected" : "")>New</option>
+                                        <option value="In Progress" @(c.Status == "In Progress" ? "selected" : "")>In Progress</option>
+                                        <option value="Closed" @(c.Status == "Closed" ? "selected" : "")>Closed</option>
+                                    </select>
+                                </td>
+                                <td>@c.CreatedDate.ToString("dd-MMM-yyyy")</td>
+                                <td class="action">
+                                    <a href="/Case/Edit?caseId=@c.CaseId">Edit</a>
+                                </td>
+                                <td>
+                                    <a href="javascript:void(0)"
+                                       onclick="loadHistory('@c.CaseId')"
+                                       style="color:#2563eb;font-weight:600">
+                                        View
+                                    </a>
+                                </td>
+                                <td>
+                                    <button class="btn-primary"
+                                            onclick="openUploadModal('@c.CaseId')">
+                                        📷 Upload
+                                    </button>
+                                </td>
+
+
+                            </tr>
+
+                        }
+                    </tbody>
+                </table>
+
+            </div>
+        </div>
+    </div>
+    <div id="historyModal" style="
+display:none;
+position:fixed;
+inset:0;
+background:rgba(0,0,0,0.5);
+align-items:center;
+justify-content:center;
+z-index:9999;">
+        <div style="background:#fff;padding:20px;border-radius:8px;width:600px;max-height:70vh;overflow:auto">
+            <h3>📜 Case History</h3>
+      
+            <table style="width:100%;margin-top:10px;border-collapse:collapse">
+                <thead>
+                    <tr>
+                        <th>Action</th>
+                        <th>From</th>
+                        <th>To</th>
+                        <th>By</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody id="historyBody"></tbody>
+            </table>
+            </div>
+            <div style="text-align:right;margin-top:15px">
+                <button onclick="closeHistory()" class="btn-primary">Close</button>
+            </div>
+        </div>
+ 
+    <!-- MODAL -->
+    <div id="textModal">
+        <div class="modal-box">
+            <h3>Full Location</h3>
+            <p id="modalText" style="white-space:pre-wrap;margin-top:10px;"></p>
+            <div style="text-align:right;margin-top:15px">
+                <button class="btn-primary" onclick="closeModal()">Close</button>
+            </div>
+        </div>
+    </div>
+    <!-- IMAGE UPLOAD MODAL -->
+    <div id="uploadModal" style="
+display:none;
+position:fixed;
+inset:0;
+background:rgba(0,0,0,0.5);
+align-items:center;
+justify-content:center;
+z-index:9999;">
+
+        <div style="
+    background:#fff;
+    padding:20px;
+    border-radius:10px;
+    width:600px;
+    max-width:95%;
+    max-height:90vh;
+    overflow:auto;">
+
+            <h3 style="margin-top:0">📷 Case Images</h3>
+
+            <!-- BEFORE -->
+            <h4>🚗 Before Towing</h4>
+
+            <form onsubmit="uploadImages(event, 'Before')">
+                <input type="hidden" id="beforeCaseId" />
+                <input type="file" id="beforeFiles" multiple accept="image/*" required />
+
+                <button class="btn-primary" type="submit">
+                    ⬆ Upload Before
+                </button>
+            </form>
+
+            <!-- BEFORE IMAGES -->
+            <div id="beforeImages"
+                 style="display:flex;gap:10px;flex-wrap:wrap;margin-top:10px">
+            </div>
+
+            <hr />
+
+            <!-- AFTER -->
+            <h4>📍 After Drop</h4>
+
+            <form onsubmit="uploadImages(event, 'After')">
+                <input type="hidden" id="afterCaseId" />
+                <input type="file" id="afterFiles" multiple accept="image/*" required />
+
+                <button class="btn-primary" type="submit">
+                    ⬆ Upload After
+                </button>
+            </form>
+
+            <!-- AFTER IMAGES -->
+            <div id="afterImages"
+                 style="display:flex;gap:10px;flex-wrap:wrap;margin-top:10px">
+            </div>
+
+            <div style="text-align:right;margin-top:15px">
+                <button onclick="closeUploadModal()" class="btn-secondary">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- SCRIPTS -->
+    <script>
+        function filterTable() {
+
+            const searchText = document.getElementById("searchBox").value.toLowerCase();
+
+            const staffSelect = document.getElementById("staffSelect");
+            const staffName =
+                staffSelect.value
+                    ? staffSelect.options[staffSelect.selectedIndex]
+                        .getAttribute("data-name")
+                        ?.toLowerCase()
+                    : "";
+
+            const fromDate = document.getElementById("fromDate").value; // yyyy-MM-dd
+            const toDate = document.getElementById("toDate").value;     // yyyy-MM-dd
+
+            const rows = document.querySelectorAll("#caseTable tbody tr");
+
+            rows.forEach(row => {
+
+                const rowText = row.innerText.toLowerCase();
+                const staffCell = row.cells[9].innerText.toLowerCase();
+
+                // ✅ DATE FROM <tr>
+                const rowDate = row.getAttribute("data-created"); // yyyy-MM-dd
+
+                let show = true;
+
+                if (searchText && !rowText.includes(searchText)) show = false;
+                if (staffName && staffCell !== staffName) show = false;
+                if (fromDate && rowDate < fromDate) show = false;
+                if (toDate && rowDate > toDate) show = false;
+
+                row.style.display = show ? "" : "none";
+            });
+        }
+    </script>
+
+
+    <script>
+        function showStatusSelect(caseId) {
+            document.getElementById("badge-" + caseId).style.display = "none";
+            document.getElementById("select-" + caseId).style.display = "inline-block";
+        }
+
+        async function updateStatus(caseId, status) {
+            const res = await fetch('/Case/UpdateStatus', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ caseId, status })
+            });
+
+            const msg = await res.text();
+
+            // update UI
+            const badge = document.getElementById("badge-" + caseId);
+            const select = document.getElementById("select-" + caseId);
+
+            badge.innerText = status;
+            badge.className = "badge " + (status === "New" ? "badge-new" : "badge-closed");
+
+            select.style.display = "none";
+            badge.style.display = "inline-block";
+        }
+    </script>
+    <script>
+        async function loadHistory(caseId) {
+            const res = await fetch(`/Case/History?caseId=${caseId}`);
+            const data = await res.json();
+
+            let html = "";
+            data.forEach(h => {
+                html += `
+                <tr>
+                    <td>${h.actionType}</td>
+                    <td>${h.oldValue || "-"}</td>
+                    <td>${h.newValue || "-"}</td>
+                    <td>${h.changedBy}</td>
+                    <td>${h.changedAt}</td>
+                </tr>`;
+            });
+
+            document.getElementById("historyBody").innerHTML = html;
+            document.getElementById("historyModal").style.display = "flex";
+        }
+
+        function closeHistory() {
+            document.getElementById("historyModal").style.display = "none";
+        }
+    </script>
+    <script>
+        function exportExcel() {
+            const from = document.getElementById("fromDate").value;
+            const to = document.getElementById("toDate").value;
+            const staffId = document.getElementById("staffSelect").value;
+
+            let url = "/Report/ExportCases?";
+
+            if (from) url += "fromDate=" + from + "&";
+            if (to) url += "toDate=" + to + "&";
+            if (staffId) url += "staffId=" + staffId;
+
+            window.location.href = url;
+        }
+    </script>
+
+
+    <script>
+             async function openUploadModal(caseId) {
+            document.getElementById("beforeCaseId").value = caseId;
+            document.getElementById("afterCaseId").value = caseId;
+
+            document.getElementById("uploadModal").style.display = "flex";
+
+            await loadCaseImages(caseId);
+        }
+
+    </script>
+
+
+    <script>
+        async function loadCaseImages(caseId) {
+
+            document.getElementById("beforeImages").innerHTML = "";
+            document.getElementById("afterImages").innerHTML = "";
+
+            const res = await fetch(`/Case/GetCaseImages?caseId=${caseId}`);
+            const images = await res.json();
+
+            images.forEach(img => {
+
+                const html = `
+                <div style="text-align:center">
+                    <img src="/Case/Image/${img.imageId}"
+                         style="width:100px;height:80px;object-fit:cover;border-radius:6px"
+                         onerror="this.style.display='none'" />
+
+                    <div style="margin-top:4px">
+                        <a href="/Case/DownloadImage/${img.imageId}">⬇ Download</a> |
+                        <a href="javascript:void(0)"
+                           onclick="deleteImage(${img.imageId}, '${caseId}')"
+                           style="color:red">🗑 Remove</a>
+                    </div>
+                </div>`;
+
+                if (img.sectionType === "Before") {
+                    document.getElementById("beforeImages").innerHTML += html;
+                } else {
+                    document.getElementById("afterImages").innerHTML += html;
+                }
+            });
+        }
+
+    </script>
+
+
+    <script>
+        async function uploadImages(e, section) {
+            e.preventDefault(); // ❌ stop page reload
+
+            const caseId = section === "Before"
+                ? document.getElementById("beforeCaseId").value
+                : document.getElementById("afterCaseId").value;
+
+            const filesInput = section === "Before"
+                ? document.getElementById("beforeFiles")
+                : document.getElementById("afterFiles");
+
+            const formData = new FormData();
+            formData.append("caseId", caseId);
+            formData.append("sectionType", section);
+
+            for (let f of filesInput.files) {
+                formData.append("images", f);
+            }
+
+            const res = await fetch("/Case/UploadCaseImagesFromList", {
+                method: "POST",
+                body: formData
+            });
+
+            if (res.ok) {
+                filesInput.value = "";
+                loadCaseImages(caseId); // 🔄 reload images
+            } else {
+                alert("Upload failed");
+            }
+        }
+    </script>
+    <script>
+        async function deleteImage(imageId, caseId) {
+
+            alert("JS ImageId = " + imageId); // 🔴 MUST SHOW NUMBER
+
+            if (!confirm("Delete this image?")) return;
+
+            const payload = { ImageId: imageId };
+            console.log("Sending payload:", payload);
+
+            const res = await fetch("/Case/DeleteImage", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(payload)
+            });
+
+            if (!res.ok) {
+                const msg = await res.text();
+                alert("Delete failed: " + msg);
+                return;
+            }
+
+            loadCaseImages(caseId);
+        }
+    </script>
+    <script>
+        function closeUploadModal() {
+            document.getElementById("uploadModal").style.display = "none";
+
+            // Optional cleanup (recommended)
+            document.getElementById("beforeImages").innerHTML = "";
+            document.getElementById("afterImages").innerHTML = "";
+            document.getElementById("beforeFiles").value = "";
+            document.getElementById("afterFiles").value = "";
+        }
+    </script>
+
+
+
+</body>
+</html>
