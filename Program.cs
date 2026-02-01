@@ -9,10 +9,10 @@ ExcelPackage.License.SetNonCommercialPersonal("Proffessional");
 
 builder.Services.AddControllersWithViews();
 
-builder.Services.AddDbContextPool<ApplicationDbContext>(options =>
-    options.UseSqlServer(
-        builder.Configuration.GetConnectionString("DefaultConnection")
-    ));
+// builder.Services.AddDbContextPool<ApplicationDbContext>(options =>
+//     options.UseSqlServer(
+//         builder.Configuration.GetConnectionString("DefaultConnection")
+//     ));
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {
@@ -35,3 +35,4 @@ app.MapControllerRoute(
     pattern: "{controller=Account}/{action=Login}/{id?}");
 
 app.Run();
+
